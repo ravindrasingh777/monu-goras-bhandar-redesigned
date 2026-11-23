@@ -1,0 +1,1 @@
+ALTER TABLE "products" ADD COLUMN "weight" real DEFAULT 0.5;

@@ -1,0 +1,16 @@
+import { SidebarProvider } from "@/components/ui/sidebar"
+import { AppSidebar } from "@/components/app-sidebar"
+import { Toaster } from "@/components/ui/toast"
+
+export default function Layout({ children }: { children: React.ReactNode }) {
+  return (
+    <SidebarProvider>
+      <AppSidebar />
+      <main className="w-full h-full bg-background">
+        {/* <SidebarTrigger /> */}
+        {children}
+        <Toaster/>
+      </main>
+    </SidebarProvider>
+  )
+}
