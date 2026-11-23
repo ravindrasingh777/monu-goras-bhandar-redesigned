@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Error",
-  description: "E-commerce website for Monu Goras Bhandar",
+  title: "Monu Goras Bhandar",
+  description: "Official website of Monu Goras Bhandar",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

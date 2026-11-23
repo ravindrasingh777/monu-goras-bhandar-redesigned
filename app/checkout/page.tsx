@@ -491,7 +491,7 @@ export default function CheckoutPage() {
               // id="pay-now-button"
               form="checkout-form"
               disabled={cartItems.length === 0 || !selectedShipping}
-              className={`mb-8 w-full hidden sm:block rounded-xl bg-blue-600 py-5 text-lg font-semibold text-white transition hover:bg-blue-700 ${!selectedShipping && "opacity-35"}`}
+              className={`mb-8 w-full hidden sm:block rounded-xl bg-[#A1351B] py-5 text-lg font-semibold text-white transition hover:bg-[#A1351B] ${!selectedShipping && "opacity-35"}`}
             >
               Pay With UPI QR Code
             </button>
@@ -616,7 +616,7 @@ export default function CheckoutPage() {
                 // id="pay-now-mobile-button"
                 form="checkout-form"
                 disabled={cartItems.length === 0 || !selectedShipping || isSearching}
-                className={`mb-8 w-full block sm:hidden rounded-xl bg-blue-600 py-5 text-lg font-semibold text-white transition hover:bg-blue-700 ${!selectedShipping && "opacity-35"}`}
+                className={`mb-8 w-full block sm:hidden rounded-xl bg-[#A1351B] py-5 text-lg font-semibold text-white transition hover:bg-[#A1351B] ${!selectedShipping && "opacity-35"}`}
               >
                 Pay With UPI QR Code
               </button>

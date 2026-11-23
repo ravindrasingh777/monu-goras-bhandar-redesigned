@@ -112,12 +112,12 @@ export default function TransactionConfirmation({
         "
       >
         {/* Header */}
-        <div className="bg-blue-600 text-white px-5 sm:px-7 py-6 shadow-md shrink-0">
+        <div className="bg-[#A1351B] text-white px-5 sm:px-7 py-6 shadow-md shrink-0">
           <DialogTitle className="text-xl sm:text-2xl font-bold">
             Monu Goras Bhandar
           </DialogTitle>
 
-          <div className="mt-3 inline-flex bg-blue-500 px-4 py-2 text-sm font-semibold">
+          <div className="mt-3 inline-flex bg-[#A1351B] px-4 py-2 text-sm font-semibold">
             Order ID: {orderId}
           </div>
         </div>
