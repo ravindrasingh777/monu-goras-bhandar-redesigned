@@ -6,24 +6,30 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { Upload, Image as ImageIcon, X } from "lucide-react";
+import { X } from "lucide-react";
 import { toast } from "./ui/toast";
 import { updateOrderDetails } from "@/helper/order/action";
 import { useCartStore } from "@/store/cart-store";
 import { useRouter } from "next/navigation";
+import { transactionSchema } from "@/lib/validation";
+import z from "zod";
 
+type FormData = z.infer<typeof transactionSchema>;
 export default function TransactionConfirmation({
   open,
   onOpenChange,
   orderId,
   onBack,
 }: any) {
-    const router = useRouter();
+  const router = useRouter();
   const [transactionId, setTransactionId] = useState("");
   const [senderName, setSenderName] = useState("");
   const [screenshot, setScreenshot] = useState(null);
   const [loading, setLoading] = useState(false);
   const clearCart = useCartStore((state) => state.clearCart);
+  const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>(
+    {},
+  );
 
   const handleImageUpload = async (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -67,6 +73,20 @@ export default function TransactionConfirmation({
       paymentImage: screenshot,
       nameOfSender: senderName,
     };
+    const result = transactionSchema.safeParse(data);
+
+    if (!result.success) {
+      const fieldErrors = result.error.flatten().fieldErrors;
+
+      setErrors({
+        transactionId: fieldErrors.transactionId?.[0],
+        nameOfSender: fieldErrors.nameOfSender?.[0],
+      });
+
+      return;
+    }
+
+    setErrors({});
     const response = await updateOrderDetails(data);
 
     if (response.success) {
@@ -82,7 +102,7 @@ export default function TransactionConfirmation({
       setSenderName("");
       onBack(false);
       clearCart();
-      router.push(`/order-received/${orderId}`)
+      router.push(`/order-received/${orderId}`);
     } else {
       toast.add({
         type: "error",
@@ -138,13 +158,17 @@ export default function TransactionConfirmation({
                 id="transactionId"
                 type="text"
                 inputMode="numeric"
-                maxLength={12}
                 value={transactionId}
-                onChange={(e) =>
+                onChange={(e) => {
                   setTransactionId(
                     e.target.value.replace(/\D/g, "").slice(0, 12),
-                  )
-                }
+                  );
+
+                  setErrors((prev) => ({
+                    ...prev,
+                    transactionId: undefined,
+                  }));
+                }}
                 className="
                   max-w-[307px]
                   h-14
@@ -156,6 +180,9 @@ export default function TransactionConfirmation({
                 "
                 placeholder="Enter transactionId of payment"
               />
+              {errors.transactionId && (
+                <p className="text-red-500 text-xs">{errors.transactionId}</p>
+              )}
             </div>
 
             {/* Sender name */}
@@ -171,7 +198,14 @@ export default function TransactionConfirmation({
                 id="sendername"
                 type="text"
                 value={senderName}
-                onChange={(e) => setSenderName(e.target.value)}
+                onChange={(e) => {
+                  setSenderName(e.target.value);
+
+                  setErrors((prev) => ({
+                    ...prev,
+                    nameOfSender: undefined,
+                  }));
+                }}
                 className="
                   max-w-[307px]
                   h-14
@@ -183,6 +217,9 @@ export default function TransactionConfirmation({
                 "
                 placeholder="Ex: Jone wick"
               />
+              {errors.nameOfSender && (
+                <p className="text-red-500 text-xs">{errors.nameOfSender}</p>
+              )}
             </div>
 
             {/* Screenshot Upload */}
@@ -215,7 +252,11 @@ export default function TransactionConfirmation({
                     {/* <ImageIcon size={16} /> */}
                     {/* <span className="max-w-[220px] truncate">{screenshot}</span> */}
 
-                    <img className="w-20 md:w-32 h-20 md:h-32" src={screenshot} alt="payment image" />
+                    <img
+                      className="w-20 md:w-32 h-20 md:h-32"
+                      src={screenshot}
+                      alt="payment image"
+                    />
 
                     <button
                       type="button"

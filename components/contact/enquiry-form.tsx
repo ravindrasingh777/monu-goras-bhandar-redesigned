@@ -13,6 +13,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "../ui/toast";
+import { contactSchema } from "@/lib/validation";
+import z from "zod";
 
 const enquiryTypes = [
   "Home delivery",
@@ -22,11 +24,16 @@ const enquiryTypes = [
   "Other",
 ];
 
+type FormData = z.infer<typeof contactSchema>;
+
 export default function EnquiryForm() {
   const [name, setName] = useState("");
   const [mobile, setMobile] = useState("");
   const [enquiry, setEnquiry] = useState(enquiryTypes[0]);
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>(
+    {},
+  );
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -39,6 +46,21 @@ export default function EnquiryForm() {
         mobile,
         enquiryFor: enquiry,
       };
+
+      const result = contactSchema.safeParse(data);
+
+      if (!result.success) {
+        const fieldErrors = result.error.flatten().fieldErrors;
+
+        setErrors({
+          name: fieldErrors.name?.[0],
+          mobile: fieldErrors.mobile?.[0],
+        });
+
+        return;
+      }
+
+      setErrors({});
 
       const response = await fetch("/api/sendMail", {
         method: "POST",
@@ -88,11 +110,11 @@ export default function EnquiryForm() {
           <Label htmlFor="name">Full name</Label>
           <Input
             id="name"
-            required
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Your name"
           />
+          {errors.name && <p className="text-red-500 text-xs">{errors.name}</p>}
         </div>
 
         {/* Mobile Number */}
@@ -102,16 +124,16 @@ export default function EnquiryForm() {
             id="mobile"
             type="tel"
             inputMode="numeric"
-            pattern="[0-9]{10}"
-            maxLength={10}
             title="Enter a 10-digit mobile number"
-            required
             value={mobile}
             onChange={(e) =>
               setMobile(e.target.value.replace(/\D/g, "").slice(0, 10))
             }
             placeholder="10-digit number"
           />
+          {errors.mobile && (
+            <p className="text-red-500 text-xs">{errors.mobile}</p>
+          )}
         </div>
       </div>
 

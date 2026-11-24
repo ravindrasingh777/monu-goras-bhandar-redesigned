@@ -3,15 +3,19 @@
 import { useEffect, useState } from "react";
 import { CircleHelp, LockKeyhole } from "lucide-react";
 import { useCartStore } from "@/store/cart-store";
-import { coupons, shipmentRates } from "@/data/site";
+import { coupons } from "@/data/site";
 import { toast } from "@/components/ui/toast";
 import PaymentDialog from "@/components/PaymentDialog";
 import { createOrder } from "@/helper/order/action";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import z from "zod";
+import { addressSchema } from "@/lib/validation";
 
 const inputClass =
   "w-full h-[58px] rounded-xl border border-gray-300 bg-white px-4 text-sm outline-none transition focus:border-blue-600 focus:ring-1 focus:ring-blue-600";
+
+type FormData = z.infer<typeof addressSchema>;
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -33,6 +37,15 @@ export default function CheckoutPage() {
   const [couponCode, setCouponCode] = useState("");
   const [createdOrder, setCreatedOrder] = useState<any>();
   const [openQrModal, setOpenQrModal] = useState(false);
+  const [errors, setErrors] = useState<any>({});
+
+  const handleFieldChange = (field: string) => {
+  setErrors((prev: any) => {
+    const updatedErrors = { ...prev };
+    delete updatedErrors[field];
+    return updatedErrors;
+  });
+};
 
   const cartSubtotal = cartItems.reduce(
     (total, item) => total + item.final_price * item.quantity,
@@ -150,8 +163,53 @@ export default function CheckoutPage() {
       shippingProvider: selectedShipping?.courier_name,
       expectedDelivery: selectedShipping?.etd,
     };
-    console.log("checkout data", data);
 
+    const validationData = {
+      firstName: String(formData.get("first_name") ?? ""),
+      email: String(formData.get("email") ?? ""),
+      phone: String(formData.get("phone") ?? ""),
+      address: String(formData.get("address") ?? ""),
+      city: String(formData.get("city") ?? ""),
+      state: String(formData.get("state") ?? ""),
+      pincode,
+
+      billing,
+
+      billingDetails:
+        billing === "different"
+          ? {
+              firstName: String(formData.get("billing_first_name") ?? ""),
+              address: String(formData.get("billing_address") ?? ""),
+              city: String(formData.get("billing_city") ?? ""),
+              state: String(formData.get("billing_state") ?? ""),
+              phone: String(formData.get("billing_phone") ?? ""),
+            }
+          : undefined,
+    };
+
+    const result = addressSchema.safeParse(validationData);
+
+    if (!result.success) {
+      toast.add({
+        type: "error",
+        title: "Required Details Missing",
+        description: "Please complete all required details before proceeding.",
+      });
+      const fieldErrors = result.error.issues;
+
+      const newErrors: Record<string, string> = {};
+
+      fieldErrors.forEach((issue) => {
+        const path = issue.path.join(".");
+
+        newErrors[path] = issue.message;
+      });
+
+      setErrors(newErrors);
+      return;
+    }
+
+    setErrors({});
     const response = await createOrder(data);
     if (response?.success) {
       setOpenQrModal(true);
@@ -213,19 +271,28 @@ export default function CheckoutPage() {
             >
               {/* Contact */}
               <div className="mb-10">
-                <Button type="button" onClick={() => router.push("/our-products")}>
+                <Button
+                  type="button"
+                  onClick={() => router.push("/our-products")}
+                >
                   Back
                 </Button>
                 <div className="my-4 flex items-center justify-between">
                   <h2 className="text-2xl font-semibold">Contact</h2>
                 </div>
 
-                <input
-                  type="email"
-                  name="email"
-                  placeholder="Enter Your Email Address"
-                  className={inputClass}
-                />
+                <div>
+                  <input
+                    type="email"
+                    name="email"
+                    placeholder="Enter Your Email Address"
+                    onChange={() => handleFieldChange("email")}
+                    className={inputClass}
+                  />
+                  {errors.email && (
+                    <p className="text-red-500 text-xs">{errors.email}</p>
+                  )}
+                </div>
 
                 <label className="mt-4 flex items-center gap-3 text-sm">
                   <input
@@ -256,11 +323,18 @@ export default function CheckoutPage() {
                 </div>
 
                 <div className="mb-3 grid grid-cols-2 gap-3">
-                  <input
-                    name="first_name"
-                    placeholder="First name"
-                    className={inputClass}
-                  />
+                  <div>
+                    <input
+                      name="first_name"
+                      placeholder="First name"
+                      className={inputClass}
+                      onChange={() => handleFieldChange("firstName")}
+                    />
+                    {errors.firstName && (
+                      <p className="text-red-500 text-xs">{errors.firstName}</p>
+                    )}
+                  </div>
+
                   <input
                     name="last_name"
                     placeholder="Last name"
@@ -273,40 +347,67 @@ export default function CheckoutPage() {
                     name="address"
                     placeholder="Address"
                     className={inputClass}
+                    onChange={() => handleFieldChange("address")}
                   />
+                  {errors.address && (
+                    <p className="text-red-500 text-xs">{errors.address}</p>
+                  )}
                 </div>
 
                 <div className="mb-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
-                  <input
-                    name="city"
-                    placeholder="City"
-                    className={inputClass}
-                  />
-                  <select name="state" className={inputClass}>
-                    <option value="">State</option>
-                    <option>Rajasthan</option>
-                    <option>Maharashtra</option>
-                    <option>Delhi</option>
-                    <option>Gujarat</option>
-                  </select>
-                  <input
-                    placeholder="PIN code"
-                    value={pincode}
-                    maxLength={6}
-                    inputMode="numeric"
-                    onChange={(e) =>
-                      setPincode(e.target.value.replace(/\D/g, ""))
-                    }
-                    className={inputClass}
-                  />
+                  <div>
+                    <input
+                      name="city"
+                      placeholder="City"
+                      className={inputClass}
+                      onChange={() => handleFieldChange("city")}
+                    />
+                    {errors.city && (
+                      <p className="text-red-500 text-xs">{errors.city}</p>
+                    )}
+                  </div>
+                  <div>
+                    <select onChange={() => handleFieldChange("state")} name="state" className={inputClass}>
+                      <option value="">State</option>
+                      <option>Rajasthan</option>
+                      <option>Maharashtra</option>
+                      <option>Delhi</option>
+                      <option>Gujarat</option>
+                    </select>
+                    {errors.state && (
+                      <p className="text-red-500 text-xs">{errors.state}</p>
+                    )}
+                  </div>
+                  <div>
+                    <input
+                      name="pincode"
+                      placeholder="PIN code"
+                      value={pincode}
+                      inputMode="numeric"
+                      onChange={(e) => {
+    setPincode(e.target.value.replace(/\D/g, ""));
+    handleFieldChange("pincode");
+  }}
+                      className={inputClass}
+                    />
+                    {errors.pincode && (
+                      <p className="text-red-500 text-xs">{errors.pincode}</p>
+                    )}
+                  </div>
                 </div>
 
-                <input
-                  name="phone"
-                  placeholder="Phone"
-                  type="tel"
-                  className={inputClass}
-                />
+                <div>
+                  <input
+                    name="phone"
+                    placeholder="Phone"
+                    type="tel"
+                    className={inputClass}
+                    onChange={() => handleFieldChange("phone")}
+                  />
+                  {errors.phone && (
+                    <p className="text-red-500 text-xs">{errors.phone}</p>
+                  )}
+                </div>
               </div>
 
               {/* Shipping Method */}
@@ -316,7 +417,8 @@ export default function CheckoutPage() {
                 <div className="overflow-hidden rounded-2xl bg-gray-100">
                   {pincode.length !== 6 ? (
                     <p className="p-5 text-sm text-gray-500">
-                      Enter your shipping address with pincode to view available shipping methods.
+                      Enter your shipping address with pincode to view available
+                      shipping methods.
                     </p>
                   ) : searchedPincode !== pincode ? (
                     <p className="p-5 text-sm text-gray-500">
@@ -391,7 +493,7 @@ export default function CheckoutPage() {
                       </label>
                     ))
                   ) : (
-                    <p className="p-5 text-sm text-red-500">
+                    <p className="p-5 text-sm text-red-500 ">
                       No shipping partners available for this PIN code.
                     </p>
                   )}
@@ -437,11 +539,19 @@ export default function CheckoutPage() {
                     <>
                       <div className="p-2">
                         <div className="mb-3 grid grid-cols-2 gap-3">
-                          <input
-                            name="billing_first_name"
-                            placeholder="First name"
-                            className={inputClass}
-                          />
+                          <div>
+                            <input
+                              name="billing_first_name"
+                              placeholder="First name"
+                              className={inputClass}
+                              onChange={() => handleFieldChange("billingDetails.firstName")}
+                            />
+                            {errors["billingDetails.firstName"] && (
+                              <p className="text-red-500 text-xs">
+                                {errors["billingDetails.firstName"]}
+                              </p>
+                            )}
+                          </div>
                           <input
                             name="billing_last_name"
                             placeholder="Last name"
@@ -453,31 +563,60 @@ export default function CheckoutPage() {
                             name="billing_address"
                             placeholder="Address"
                             className={inputClass}
+                            onChange={() => handleFieldChange("billingDetails.address")}
                           />
+                          {errors["billingDetails.address"] && (
+                            <p className="text-red-500 text-xs">
+                              {errors["billingDetails.address"]}
+                            </p>
+                          )}
                         </div>
 
                         <div className="mb-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                          <input
-                            name="billing_city"
-                            placeholder="City"
-                            className={inputClass}
-                          />
-                          <select name="billing_state" className={inputClass}>
-                            <option value="">State</option>
-                            <option>Rajasthan</option>
-                            <option>Maharashtra</option>
-                            <option>Delhi</option>
-                            <option>Gujarat</option>
-                          </select>
+                          <div>
+                            <input
+                              name="billing_city"
+                              placeholder="City"
+                              className={inputClass}
+                              onChange={() => handleFieldChange("billingDetails.city")}
+                            />
+                            {errors["billingDetails.city"] && (
+                              <p className="text-red-500 text-xs">
+                                {errors["billingDetails.city"]}
+                              </p>
+                            )}
+                          </div>
+                          <div>
+                            <select onChange={() => handleFieldChange("billingDetails.state")} name="billing_state" className={inputClass}>
+                              <option value="">State</option>
+                              <option>Rajasthan</option>
+                              <option>Maharashtra</option>
+                              <option>Delhi</option>
+                              <option>Gujarat</option>
+                            </select>
+                            {errors["billingDetails.state"] && (
+                              <p className="text-red-500 text-xs">
+                                {errors["billingDetails.state"]}
+                              </p>
+                            )}
+                          </div>
                           {/* <input placeholder="PIN code" className={inputClass} /> */}
                         </div>
 
-                        <input
-                          name="billing_phone"
-                          placeholder="Phone"
-                          type="tel"
-                          className={inputClass}
-                        />
+                        <div>
+                          <input
+                            name="billing_phone"
+                            placeholder="Phone"
+                            type="tel"
+                            className={inputClass}
+                            onChange={() => handleFieldChange("billingDetails.phone")}
+                          />
+                          {errors["billingDetails.phone"] && (
+                            <p className="text-red-500 text-xs">
+                              {errors["billingDetails.phone"]}
+                            </p>
+                          )}{" "}
+                        </div>
                       </div>
                     </>
                   )}
@@ -561,7 +700,7 @@ export default function CheckoutPage() {
                 <button
                   type="button"
                   onClick={() => setAppliedCoupon(null)}
-                  className="text-red-500"
+                  className="text-red-500 "
                 >
                   Remove
                 </button>
@@ -615,7 +754,9 @@ export default function CheckoutPage() {
                 type="submit"
                 // id="pay-now-mobile-button"
                 form="checkout-form"
-                disabled={cartItems.length === 0 || !selectedShipping || isSearching}
+                disabled={
+                  cartItems.length === 0 || !selectedShipping || isSearching
+                }
                 className={`mb-8 w-full block sm:hidden rounded-xl bg-[#A1351B] py-5 text-lg font-semibold text-white transition hover:bg-[#A1351B] ${!selectedShipping && "opacity-35"}`}
               >
                 Pay With UPI QR Code
