@@ -24,7 +24,6 @@ export default function RecentPurchasePopup() {
 
         if (isMounted) {
           setRecentOrders(response?.data || []);
-          console.log("response", response);
         }
       } catch (error) {
         console.error("Failed to fetch recent purchases:", error);

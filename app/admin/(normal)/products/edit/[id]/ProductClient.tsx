@@ -68,8 +68,6 @@ export default function ProductClient({ productInfo,tagsData, categories }: any)
       console.error(data.error);
       return;
     }
-
-    console.log("Image URL:", data.url);
     toast.add({
       type: "success",
       title: "Image uploaded successfully!",

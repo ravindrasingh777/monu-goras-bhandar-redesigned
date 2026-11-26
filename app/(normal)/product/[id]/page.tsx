@@ -4,8 +4,9 @@ import { notFound } from "next/navigation";
 import { cache, Suspense } from "react";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
-import { categories, products } from "@/db/schema";
+import { categories, productReviewImages, productReviews, products } from "@/db/schema";
 import { ProductDetails } from "@/components/products/ProductDetails";
+import { getProductReviews } from "@/helper/review/action";
 
 const font = Bricolage_Grotesque({ subsets: ["latin"] });
 
@@ -17,11 +18,10 @@ const getProduct = cache(async (id: string) => {
   if (!UUID_PATTERN.test(id)) return null;
 
   const [row] = await db
-    .select({ product: products, categoryName: categories.name })
+    .select({ product: products, categoryName: categories.name})
     .from(products)
     .leftJoin(categories, eq(categories.id, products.categoryId))
     .where(eq(products.id, id))
-    .limit(1);
 
   return row ?? null;
 });
@@ -34,8 +34,6 @@ export async function generateMetadata({
   const { id } = await params;
   const row = await getProduct(id);
 
-  console.log("row", row);
-
   if (!row) return { title: "Product not found" };
 
   return {
@@ -47,11 +45,12 @@ export async function generateMetadata({
 async function GetProductInfo({ params }: PageProps) {
   const { id } = await params;
   const row = await getProduct(id);
+  const reviews = await getProductReviews(id);
   if (!row) notFound();
 
   return (
     <div className={font.className}>
-      <ProductDetails product={row?.product} categoryName={row?.categoryName} />
+      <ProductDetails product={row?.product} categoryName={row?.categoryName} reviews={reviews} />
     </div>
   );
 }

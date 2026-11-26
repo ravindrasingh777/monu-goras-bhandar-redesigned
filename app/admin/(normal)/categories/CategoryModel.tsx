@@ -52,7 +52,6 @@ export default function CategoryModel({ categoryDetails, open, onClose }: any) {
       return;
     }
 
-    console.log("Image URL:", data.url);
     toast.add({
       type: "success",
       title: "Image uploaded successfully!",
@@ -74,7 +73,6 @@ export default function CategoryModel({ categoryDetails, open, onClose }: any) {
   };
 
   const submitHandler = async (e: any) => {
-    console.log("buttn db");
     e.preventDefault();
 
     try {

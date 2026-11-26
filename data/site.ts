@@ -5,21 +5,23 @@ import {
   Leaf,
   Info,
   Phone,
+  PackageSearch,
 } from "lucide-react";
-
 
 export const site = {
   name: "Monu Goras Bhandar",
   phone: "+91 92521 39481",
   whatsapp: "919887700428",
   email: "ravindrasinghrss2004@gmail.com",
-  address: "26, Phool Colony, near Mahima Public School, Sanganer, Jaipur 302029, Rajasthan",
+  address:
+    "26, Phool Colony, near Mahima Public School, Sanganer, Jaipur 302029, Rajasthan",
 };
 
 export const telLink = `tel:${site.phone.replace(/\s/g, "")}`;
 
-export const whatsappLink = (message = "Hi, I would like to order fresh dairy products.") =>
-  `https://wa.me/${site.whatsapp}?text=${encodeURIComponent(message)}`;
+export const whatsappLink = (
+  message = "Hi, I would like to order fresh dairy products.",
+) => `https://wa.me/${site.whatsapp}?text=${encodeURIComponent(message)}`;
 
 export const navLinks = [
   {
@@ -35,58 +37,117 @@ export const navLinks = [
     description: "Explore our natural products",
   },
   {
-    label: "Delivery",
-    href: "/#delivery",
-    icon: Truck,
-    description: "Our delivery process",
+    label: "About Us",
+    href: "/about-us",
+    icon: Info,
+    description: "Discover our story and values",
   },
   {
-    label: "Why us",
+    label: "Why Choose Us",
     href: "/#why-us",
     icon: Leaf,
     description: "Discover what makes us special",
   },
   {
-    label: "About Us",
-    href: "/about-us",
-    icon: Info,
-    description: "Our story and values",
+    label: "Delivery",
+    href: "/#delivery",
+    icon: Truck,
+    description: "Learn about our delivery process",
+  },
+  {
+    label: "Track Order",
+    href: "/track-order",
+    icon: PackageSearch,
+    description: "Track your order status",
   },
   {
     label: "Contact Us",
     href: "/contact-us",
     icon: Phone,
-    description: "Get in touch with us",
+    description: "We're here to help you",
   },
-];;
+];
 
 export const deliveryAreas = ["Sanganer", "Pratap Nagar", "Mansarovar"];
 
-export const categories = ["All", "Milk", "Ghee", "Chaach", "Shrikhand", "Sweets"] as const;
+export const categories = [
+  "All",
+  "Milk",
+  "Ghee",
+  "Chaach",
+  "Shrikhand",
+  "Sweets",
+] as const;
 export type Category = Exclude<(typeof categories)[number], "All">;
 
 // Image for each product: public/images/products/<id>.png
-export type Product = { id: string; name: string; category: Category; size?: string };
+export type Product = {
+  id: string;
+  name: string;
+  category: Category;
+  size?: string;
+};
 
 export const products: Product[] = [
-  { id: "cow-milk-1kg", name: "Goras Cow Milk", category: "Milk", size: "1 kg" },
-  { id: "bilona-ghee-1kg", name: "Goras Bilona Ghee", category: "Ghee", size: "1 kg" },
-  { id: "rasgulla", name: "Goras Rasgulla", category: "Sweets", size: "1250 gm" },
+  {
+    id: "cow-milk-1kg",
+    name: "Goras Cow Milk",
+    category: "Milk",
+    size: "1 kg",
+  },
+  {
+    id: "bilona-ghee-1kg",
+    name: "Goras Bilona Ghee",
+    category: "Ghee",
+    size: "1 kg",
+  },
+  {
+    id: "rasgulla",
+    name: "Goras Rasgulla",
+    category: "Sweets",
+    size: "1250 gm",
+  },
   { id: "sri-khand", name: "Goras Sri-Khand", category: "Shrikhand" },
-  { id: "cow-milk-6kg", name: "Goras Cow Milk", category: "Milk", size: "6 kg" },
-  { id: "cow-milk-half-kg", name: "Goras Cow Milk", category: "Milk", size: "1/2 kg" },
+  {
+    id: "cow-milk-6kg",
+    name: "Goras Cow Milk",
+    category: "Milk",
+    size: "6 kg",
+  },
+  {
+    id: "cow-milk-half-kg",
+    name: "Goras Cow Milk",
+    category: "Milk",
+    size: "1/2 kg",
+  },
   { id: "chaach", name: "Goras Chaach", category: "Chaach", size: "1/2 kg" },
   { id: "ghee-1kg", name: "Goras Ghee", category: "Ghee", size: "1 kg" },
   { id: "ghee-15kg", name: "Goras Ghee", category: "Ghee", size: "15 kg" },
-  { id: "bilona-ghee-15kg", name: "Goras Bilona Ghee", category: "Ghee", size: "15 kg" },
+  {
+    id: "bilona-ghee-15kg",
+    name: "Goras Bilona Ghee",
+    category: "Ghee",
+    size: "15 kg",
+  },
 ];
 
 export const testimonials = [
-  { name: "Raghuman Singh", quote: "Amazing service and very fresh dairy products. The delivery was quick and hassle free!" },
-  { name: "Mohit Saini", quote: "The yogurt is so creamy and fresh. The delivery staff was very courteous." },
-  { name: "Mal Singh Shekhawat", quote: "Butter tastes just like homemade. Delivery team was on time and very polite." },
+  {
+    name: "Raghuman Singh",
+    quote:
+      "Amazing service and very fresh dairy products. The delivery was quick and hassle free!",
+  },
+  {
+    name: "Mohit Saini",
+    quote:
+      "The yogurt is so creamy and fresh. The delivery staff was very courteous.",
+  },
+  {
+    name: "Mal Singh Shekhawat",
+    quote:
+      "Butter tastes just like homemade. Delivery team was on time and very polite.",
+  },
 ];
-
 
 export const shipmentRates = [
   { platform: "Shiprocket", pincode: "302001", price: 45 },

@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from "next/link";
@@ -17,23 +16,18 @@ import {
   Mail,
 } from "lucide-react";
 
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { usePathname } from "next/navigation";
 
 interface Props {
   order: any;
 }
 
-const formatCurrency = (value: any) =>
-  `₹${Number(value ?? 0).toFixed(2)}`;
+const formatCurrency = (value: any) => `₹${Number(value ?? 0).toFixed(2)}`;
 
 const formatDate = (value: any) => {
   if (!value) return "Not available";
@@ -71,13 +65,7 @@ const getStatusColor = (status: string) => {
   }
 };
 
-const AddressCard = ({
-  title,
-  address,
-}: {
-  title: string;
-  address: any;
-}) => {
+const AddressCard = ({ title, address }: { title: string; address: any }) => {
   if (!address) return null;
 
   return (
@@ -114,6 +102,7 @@ const AddressCard = ({
 };
 
 export default function OrderReceived({ order }: Props) {
+  const pathname = usePathname();
   const payment = order.payment;
   const shipping = order.shipping;
 
@@ -121,9 +110,10 @@ export default function OrderReceived({ order }: Props) {
     payment?.paymentVerified || payment?.paymentStatus === "paid";
 
   return (
-    <main className="min-h-screen bg-gray-50 py-8 sm:py-12">
+    <main
+      className={`min-h-screen ${pathname == "/track-order" ? "bg-transparent" : "bg-gray-50"} py-8 sm:py-12`}
+    >
       <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
-
         {/* Success Header */}
         <div className="mb-8 text-center">
           <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-green-100">
@@ -135,8 +125,8 @@ export default function OrderReceived({ order }: Props) {
           </h1>
 
           <p className="mt-2 text-sm text-muted-foreground sm:text-base">
-            Your order has been received successfully.
-            We will notify you when your order is processed.
+            Your order has been received successfully. We will notify you when
+            your order is processed.
           </p>
 
           <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
@@ -147,7 +137,7 @@ export default function OrderReceived({ order }: Props) {
             <Badge
               variant="outline"
               className={`px-3 py-1 text-sm capitalize ${getStatusColor(
-                payment?.paymentStatus
+                payment?.paymentStatus,
               )}`}
             >
               Payment: {payment?.paymentStatus || "Pending"}
@@ -156,10 +146,8 @@ export default function OrderReceived({ order }: Props) {
         </div>
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-
           {/* Left Section */}
           <div className="space-y-6 lg:col-span-2">
-
             {/* Order Information */}
             <Card className="shadow-sm">
               <CardHeader>
@@ -171,20 +159,15 @@ export default function OrderReceived({ order }: Props) {
 
               <CardContent>
                 <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-
                   <div>
                     <p className="text-sm text-muted-foreground">
                       Order Number
                     </p>
-                    <p className="mt-1 font-semibold">
-                      {order.orderNumber}
-                    </p>
+                    <p className="mt-1 font-semibold">{order.orderNumber}</p>
                   </div>
 
                   <div>
-                    <p className="text-sm text-muted-foreground">
-                      Order Date
-                    </p>
+                    <p className="text-sm text-muted-foreground">Order Date</p>
                     <p className="mt-1 flex items-center gap-2 font-medium">
                       <CalendarDays className="h-4 w-4 text-muted-foreground" />
                       {formatDate(order.createdAt)}
@@ -210,7 +193,6 @@ export default function OrderReceived({ order }: Props) {
                       {order.phone}
                     </p>
                   </div>
-
                 </div>
               </CardContent>
             </Card>
@@ -244,9 +226,7 @@ export default function OrderReceived({ order }: Props) {
                       )}
 
                       <div className="min-w-0">
-                        <h3 className="font-semibold">
-                          {item.productName}
-                        </h3>
+                        <h3 className="font-semibold">{item.productName}</h3>
 
                         {item.sku && (
                           <p className="mt-1 text-xs text-muted-foreground">
@@ -255,7 +235,8 @@ export default function OrderReceived({ order }: Props) {
                         )}
 
                         <p className="mt-1 text-sm text-muted-foreground">
-                          Qty: {item.quantity} × {formatCurrency(item.unitPrice)}
+                          Qty: {item.quantity} ×{" "}
+                          {formatCurrency(item.unitPrice)}
                         </p>
                       </div>
                     </div>
@@ -292,22 +273,18 @@ export default function OrderReceived({ order }: Props) {
 
               <CardContent className="space-y-4">
                 <div className="flex justify-between gap-3 text-sm">
-                  <span className="text-muted-foreground">
-                    Payment Method
-                  </span>
+                  <span className="text-muted-foreground">Payment Method</span>
                   <span className="font-semibold capitalize">
                     {payment?.paymentMethod || "Not available"}
                   </span>
                 </div>
 
                 <div className="flex justify-between gap-3 text-sm">
-                  <span className="text-muted-foreground">
-                    Payment Status
-                  </span>
+                  <span className="text-muted-foreground">Payment Status</span>
                   <Badge
                     variant="outline"
                     className={`capitalize ${getStatusColor(
-                      payment?.paymentStatus
+                      payment?.paymentStatus,
                     )}`}
                   >
                     {payment?.paymentStatus || "Pending"}
@@ -315,9 +292,7 @@ export default function OrderReceived({ order }: Props) {
                 </div>
 
                 <div className="flex justify-between gap-3 text-sm">
-                  <span className="text-muted-foreground">
-                    Transaction ID
-                  </span>
+                  <span className="text-muted-foreground">Transaction ID</span>
                   <span className="font-medium text-right break-all">
                     {payment?.transactionId || "Not submitted"}
                   </span>
@@ -325,19 +300,13 @@ export default function OrderReceived({ order }: Props) {
 
                 {payment?.nameOfSender && (
                   <div className="flex justify-between gap-3 text-sm">
-                    <span className="text-muted-foreground">
-                      Sender Name
-                    </span>
-                    <span className="font-medium">
-                      {payment.nameOfSender}
-                    </span>
+                    <span className="text-muted-foreground">Sender Name</span>
+                    <span className="font-medium">{payment.nameOfSender}</span>
                   </div>
                 )}
 
                 <div className="flex justify-between gap-3 text-sm">
-                  <span className="text-muted-foreground">
-                    Verification
-                  </span>
+                  <span className="text-muted-foreground">Verification</span>
                   <Badge
                     variant="outline"
                     className={
@@ -388,31 +357,25 @@ export default function OrderReceived({ order }: Props) {
                 </div>
 
                 <div className="flex justify-between gap-3 text-sm">
-                  <span className="text-muted-foreground">
-                    Shipping Method
-                  </span>
+                  <span className="text-muted-foreground">Shipping Method</span>
                   <span className="font-medium">
                     {shipping?.shippingMethod || "Standard"}
                   </span>
                 </div>
 
                 <div className="flex justify-between gap-3 text-sm">
-                  <span className="text-muted-foreground">
-                    Tracking Number
-                  </span>
+                  <span className="text-muted-foreground">Tracking Number</span>
                   <span className="font-medium break-all text-right">
                     {shipping?.trackingNumber || "Not available yet"}
                   </span>
                 </div>
 
                 <div className="flex justify-between gap-3 text-sm">
-                  <span className="text-muted-foreground">
-                    Shipment Status
-                  </span>
+                  <span className="text-muted-foreground">Shipment Status</span>
                   <Badge
                     variant="outline"
                     className={`capitalize ${getStatusColor(
-                      shipping?.shipmentStatus
+                      shipping?.shipmentStatus,
                     )}`}
                   >
                     {shipping?.shipmentStatus || "Pending"}
@@ -451,26 +414,19 @@ export default function OrderReceived({ order }: Props) {
             <div className="lg:sticky lg:top-6">
               <Card className="shadow-sm">
                 <CardHeader>
-                  <CardTitle className="text-lg">
-                    Order Summary
-                  </CardTitle>
+                  <CardTitle className="text-lg">Order Summary</CardTitle>
                 </CardHeader>
 
                 <CardContent className="space-y-4">
-
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">
-                      Subtotal
-                    </span>
+                    <span className="text-muted-foreground">Subtotal</span>
                     <span className="font-medium">
                       {formatCurrency(order.subtotal)}
                     </span>
                   </div>
 
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">
-                      Discount
-                    </span>
+                    <span className="text-muted-foreground">Discount</span>
                     <span className="font-medium text-green-600">
                       -{formatCurrency(order.discountAmount)}
                     </span>
@@ -478,28 +434,20 @@ export default function OrderReceived({ order }: Props) {
 
                   {order.couponCode && (
                     <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">
-                        Coupon
-                      </span>
-                      <Badge variant="secondary">
-                        {order.couponCode}
-                      </Badge>
+                      <span className="text-muted-foreground">Coupon</span>
+                      <Badge variant="secondary">{order.couponCode}</Badge>
                     </div>
                   )}
 
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">
-                      Shipping Fee
-                    </span>
+                    <span className="text-muted-foreground">Shipping Fee</span>
                     <span className="font-medium">
                       {formatCurrency(order.shippingFee)}
                     </span>
                   </div>
 
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">
-                      Tax
-                    </span>
+                    <span className="text-muted-foreground">Tax</span>
                     <span className="font-medium">
                       {formatCurrency(order.taxAmount)}
                     </span>
@@ -508,9 +456,7 @@ export default function OrderReceived({ order }: Props) {
                   <Separator />
 
                   <div className="flex justify-between items-center">
-                    <span className="font-semibold">
-                      Total Amount
-                    </span>
+                    <span className="font-semibold">Total Amount</span>
                     <span className="text-xl font-bold text-blue-600">
                       {formatCurrency(order.totalAmount)}
                     </span>
@@ -532,17 +478,18 @@ export default function OrderReceived({ order }: Props) {
                   </div>
 
                   <Button size="lg">
-                    <Link className="inline-flex items-center justify-center gap-2" href="/our-products">
+                    <Link
+                      className="inline-flex items-center justify-center gap-2"
+                      href="/our-products"
+                    >
                       Continue Shopping
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
                   </Button>
-
                 </CardContent>
               </Card>
             </div>
           </div>
-
         </div>
       </div>
     </main>

@@ -89,7 +89,6 @@ export default function CheckoutPage() {
         throw new Error(result.message);
       }
 
-      console.log("result", result);
       setFilteredShippingRates(result?.couriers);
     } catch (error: any) {
       console.error(error);

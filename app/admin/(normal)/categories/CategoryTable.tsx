@@ -24,7 +24,6 @@ export default function CategoryTable({ categories }: any) {
   };
 
   const handleAddCategory = () => {
-    console.log("button db")
     setCategoryDetails(null);
     setOpenModel(true);
   };

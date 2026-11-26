@@ -53,8 +53,6 @@ export default function TransactionConfirmation({
       console.error(data.error);
       return;
     }
-
-    console.log("Image URL:", data.url);
     toast.add({
       type: "success",
       title: "Image uploaded successfully!",

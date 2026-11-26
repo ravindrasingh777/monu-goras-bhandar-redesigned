@@ -331,3 +331,59 @@ export const shippingDetails = pgTable(
   ],
 );
 
+
+export const productReviews = pgTable(
+  "product_reviews",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+
+    productId: uuid("product_id")
+      .notNull()
+      .references(() => products.id, { onDelete: "cascade" }),
+
+    userName: varchar("user_name", { length: 100 }).notNull(),
+
+    rating: integer("rating").notNull(),
+
+    feedback: text("feedback").notNull(),
+
+    isActive: boolean("is_active")
+      .default(true)
+      .notNull(),
+
+    createdAt: timestamp("created_at")
+      .defaultNow()
+      .notNull(),
+
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    index("product_reviews_product_id_idx").on(table.productId),
+  ]
+);
+
+export const productReviewImages = pgTable(
+  "product_review_images",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+
+    reviewId: uuid("review_id")
+      .notNull()
+      .references(() => productReviews.id, {
+        onDelete: "cascade",
+      }),
+
+    imageUrl: text("image_url").notNull(),
+
+    createdAt: timestamp("created_at")
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    index("product_review_images_review_id_idx").on(table.reviewId),
+  ]
+);
+
+

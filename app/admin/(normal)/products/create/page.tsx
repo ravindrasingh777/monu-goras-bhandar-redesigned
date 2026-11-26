@@ -81,7 +81,6 @@ const Page = () => {
       return;
     }
 
-    console.log("Image URL:", data.url);
     toast.add({
       type: "success",
       title: "Image uploaded successfully!",

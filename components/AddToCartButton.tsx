@@ -9,7 +9,6 @@ export default function AddToCartButton({ product }: any) {
   const addToCart = useCartStore((state) => state.addToCart);
 
   const handleAddToCart = () => {
-    console.log("product",product)
     addToCart({
       id: product.id,
       title: product.title,

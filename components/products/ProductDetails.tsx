@@ -23,9 +23,10 @@ import { toast } from "../ui/toast";
 type ProductDetailsProps = {
   product: Product;
   categoryName?: string | null;
+  reviews: any
 };
 
-export function ProductDetails({ product, categoryName }: ProductDetailsProps) {
+export function ProductDetails({ product, categoryName , reviews }: ProductDetailsProps) {
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
 
@@ -94,7 +95,7 @@ export function ProductDetails({ product, categoryName }: ProductDetailsProps) {
 
         <Separator className="my-14" />
 
-        <ProductTabs product={product} categoryName={categoryName} availability={availability} />
+        <ProductTabs product={product} categoryName={categoryName} availability={availability} reviews={reviews} />
       </div>
 
       <MobileBuyBar
